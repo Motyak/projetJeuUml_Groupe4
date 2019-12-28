@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class TU {
+public class TU_Lootable {
 
 	public static void main(String[] args) {
 		System.out.println("Initialisation de la liste de Lootable..");
