@@ -17,6 +17,8 @@ public class Plateau {
 	
 	private ArrayList<Case> cases;
 	
+	private int dim;
+	
 //	Dès qu'on aura fait les classes Corsaire et Pirate, on modifiera pour passer en parametre un ensemble de Corsaire et de Pirate
 	Plateau(List<Corsaire> corsaires, List<Pirate> pirates, int dimension) throws Exception
 	{
@@ -43,6 +45,8 @@ public class Plateau {
 
 		if(dimension<dimensionMin)
 			throw new PlateauException("La dimension de plateau min, pour cette configuration, est "+dimensionMin);
+		
+		this.dim=dimension;
 		
 		int nbCases = dimension*dimension;
 		int nbCasesTerre = (int) Math.round(nbCases*PROPORTION_CASES_TERRE);
@@ -136,47 +140,105 @@ public class Plateau {
 	
 	public static Pair<Integer,Integer> indexToCoords(int i,int dim)
 	{
-		return new Pair<Integer,Integer>(new Integer(i%dim),new Integer(i/dim));
+//		return new Pair<Integer,Integer>(new Integer(i%dim),new Integer(i/dim));
+		return new Pair<Integer,Integer>(new Integer(i/dim),new Integer(i%dim));
 	}
 	
-	public static int coordsToInt(Pair<Integer,Integer> coords,int dim)
+	public static int coordsToIndex(Pair<Integer,Integer> coords,int dim)
 	{
-		return coords.value*dim+coords.key;
+//		return coords.value*dim+coords.key;
+		
+		return coords.key*dim+coords.value;
+		
+//		return coords.key*dim+coords.value+coords.key;
+	}
+
+	public void afficher()
+	{
+//		affichage avec seulement les numeros de colonne
+//		ArrayList<String> headers = new ArrayList<String>();
+//		for(int i=1;i<=this.dim;++i)
+//			headers.add(new String("~"+String.valueOf(i)+"~"));
+//		
+//		String[] s_headers = new String[headers.size()];
+//		s_headers = headers.toArray(s_headers);
+//		
+//		String[][] data = new String[this.dim][this.dim];
+//		for(int i = 0;i<this.dim;++i)
+//		{
+//			for(int j = 0;j<this.dim;++j)
+//			{
+//				Case c = this.cases.get(Plateau.coordsToIndex(new Pair<Integer,Integer>(new Integer(i),new Integer(j)), this.dim));
+//				data[i][j]=FlipTable.of(c.toTui().key, c.toTui().value);
+//			}
+//		}
+//		
+//		System.out.println(FlipTable.of(s_headers, data));
+		
+		
+		
+		ArrayList<String> headers = new ArrayList<String>();
+		headers.add(new String(""));
+		for(int i=1;i<=this.dim;++i)
+			headers.add(new String("~"+String.valueOf(i)+"~"));
+		
+		String[] s_headers = new String[headers.size()];
+		s_headers = headers.toArray(s_headers);
+		
+		String[][] data = new String[this.dim][this.dim+1];
+		for(int i = 0;i<=this.dim-1;++i)
+		{
+			for(int j = 0;j<=this.dim;++j)
+			{
+				if(j==0)
+					data[i][j]="~"+Character.toString((char)(i+1+64))+"~";
+				else
+				{
+//					meme operation qu'en haut mais avec j-1
+					Case c = this.cases.get(Plateau.coordsToIndex(new Pair<Integer,Integer>(new Integer(i),new Integer(j-1)), this.dim));
+					data[i][j]=FlipTable.of(c.toTui().key, c.toTui().value);
+				}
+
+			}
+		}
+		System.out.println(FlipTable.of(s_headers, data));
 	}
 	
-//	faire méthode pour afficher le plateau (test)
+	public void afficherText()
+	{
+		for(int i = 0; i < this.cases.size(); i++)
+	    {
+	      System.out.println("donnée à l'indice " + i + " = " + this.cases.get(i)+" de type "+this.cases.get(i).getType().toString());
+	      if(this.cases.get(i).getLoot()!=null)
+	    	  System.out.println("__loot : "+this.cases.get(i).getLoot().toString());
+	      if(!this.cases.get(i).getPersos().isEmpty()) {
+	    	  System.out.println("__perso :"+this.cases.get(i).getPersos().get(0).getClass().getSimpleName());
+	    	  System.out.println("____coords : "+this.cases.get(i).getPersos().get(0).getCoords().key+","+this.cases.get(i).getPersos().get(0).getCoords().value);
+	    	  if(this.cases.get(i).getPersos().get(0) instanceof Corsaire)
+	    		  System.out.println("____nom : "+((Corsaire) this.cases.get(i).getPersos().get(0)).getNom());
+	      }
+	      System.out.println("");
+	    }
+	}
 	
 	public static void main(String[] args) {
 	
 		Plateau p;
-		List<Corsaire> corsaires = Arrays.asList(new Corsaire("Joueur1"),new Corsaire("Joueur2"));
+		List<Corsaire> corsaires = Arrays.asList(new Corsaire("_J1_"),new Corsaire("_J2_"));
 		List<Pirate> pirates = Arrays.asList(new Boucanier(),new Flibustier());
 		
 		try {
-			p = new Plateau(corsaires,pirates,6);
-			
-			for(int i = 0; i < p.cases.size(); i++)
-		    {
-		      System.out.println("donnée à l'indice " + i + " = " + p.cases.get(i)+" de type "+p.cases.get(i).getType().toString());
-		      if(p.cases.get(i).getLoot()!=null)
-		    	  System.out.println("__loot : "+p.cases.get(i).getLoot().toString());
-		      if(!p.cases.get(i).getPersos().isEmpty()) {
-		    	  System.out.println("__perso :"+p.cases.get(i).getPersos().get(0).getClass().getSimpleName());
-		    	  System.out.println("____coords : "+p.cases.get(i).getPersos().get(0).getCoords().key+","+p.cases.get(i).getPersos().get(0).getCoords().value);
-		    	  if(p.cases.get(i).getPersos().get(0) instanceof Corsaire)
-		    		  System.out.println("____nom : "+((Corsaire) p.cases.get(i).getPersos().get(0)).getNom());
-		      }
-		      System.out.println("");
-		    }
+			p = new Plateau(corsaires,pirates,5);
+			p.afficherText();
+			p.afficher();
+
 		} catch (PlateauException e) {
 			System.out.println(e.getMessage());
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+		
 	}
-	
-	
-	
 	
 }
