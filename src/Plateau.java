@@ -138,6 +138,16 @@ public class Plateau {
 		}
 	}
 	
+	public ArrayList<Case> getCases()
+	{
+		return this.cases;
+	}
+	
+	public int getDimension()
+	{
+		return this.dim;
+	}
+	
 	public static Pair<Integer,Integer> indexToCoords(int i,int dim)
 	{
 //		return new Pair<Integer,Integer>(new Integer(i%dim),new Integer(i/dim));
