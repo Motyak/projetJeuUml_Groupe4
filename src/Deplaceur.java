@@ -21,12 +21,15 @@ public class Deplaceur {
 		int dimension = this.plateau.getDimension();
 		int indexDepart = Plateau.coordsToIndex(p.getCoords(), dimension);
 		Pair<Integer,Integer> coordsArrivee = new Pair<Integer,Integer>(p.getCoords().key+direction.key,p.getCoords().value+direction.value);
+		int indexArrivee = Plateau.coordsToIndex(coordsArrivee, dimension);
 		
 //		si coords en dehors du plateau => return false
-		if(coordsArrivee.key<0 || coordsArrivee.key>dimension-1 || coordsArrivee.value<0 || coordsArrivee.value>dimension-1)
+//		if(coordsArrivee.key<0 || coordsArrivee.key>dimension-1 || coordsArrivee.value<0 || coordsArrivee.value>dimension-1)
+//			return false;
+		if(indexArrivee==-1)
 			return false;
 		
-		int indexArrivee = Plateau.coordsToIndex(coordsArrivee, dimension);
+		
 //		si case destination = case EAU => return false
 		if(this.plateau.getCases().get(indexArrivee).getType()==TypeCase.EAU)
 			return false;
@@ -99,7 +102,7 @@ public class Deplaceur {
 		try {
 			plateau = new Plateau(corsaires,pirates,5);
 			Deplaceur d = new Deplaceur(plateau);
-			plateau.afficher();
+			plateau.afficherAll();
 			
 			int a;
 			Scanner sc = new Scanner(System.in);
@@ -113,7 +116,7 @@ public class Deplaceur {
 			
 			d.deplacerAleat(persoADeplacer, Direction.LIGNES_DROITES_ET_DIAG, 3);
 			
-			plateau.afficher();		
+			plateau.afficherAll();		
 
 		} catch (PlateauException e) {
 			System.out.println(e.getMessage());

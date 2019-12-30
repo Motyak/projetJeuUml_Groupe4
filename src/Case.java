@@ -1,10 +1,12 @@
 import java.util.ArrayList;
 
-public class Case {
+public class Case{
 
 	public static final String CORS_TUI_COLOR = AnsiTerminal.BLUE;
 	public static final String PIR_TUI_COLOR = AnsiTerminal.RED;
 	public static final String LOOT_TUI_COLOR = AnsiTerminal.PURPLE;
+	
+	public static final String CASE_VIDE_TUI = FlipTable.of(new String[]{"      "},new String[][]{});
 	
 	private TypeCase type;
 	private ArrayList<Personnage> persos;
@@ -15,6 +17,13 @@ public class Case {
 		this.type = t;
 		this.persos = new ArrayList<Personnage>();
 		this.loot=null;
+	}
+	
+	public Case(Case c)
+	{
+		this.type=c.getType();
+		this.persos = c.getPersos();
+		this.loot = c.getLoot();
 	}
 	
 	public TypeCase getType() {

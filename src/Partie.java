@@ -52,6 +52,11 @@ public class Partie {
 		return this.deplaceur;
 	}
 	
+	public void afficherPlateau()
+	{
+		this.plateau.afficher(this.joueurCourant);
+	}
+	
 	public void actionJoueur() throws InterruptedException
 	{
 		boolean inputCorrecte=false;
@@ -68,7 +73,7 @@ public class Partie {
 		do {
 //			boucle tant que input incorrecte
 			do {
-				this.getPlateau().afficher();
+				this.afficherPlateau();
 				if(!deplacementReussi && inputCorrecte)
 					System.out.println("Déplacement impossible !");
 				this.demanderInputJoueur();
@@ -77,7 +82,7 @@ public class Partie {
 			deplacementReussi = this.traiterInput();
 		}while(!deplacementReussi);
 //		affichage plateau post deplacement
-		this.getPlateau().afficher();
+		this.afficherPlateau();
 	}
 	
 	private void annoncerTourJoueur() throws InterruptedException

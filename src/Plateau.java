@@ -14,6 +14,7 @@ public class Plateau {
 	public static int NB_PELLES_PAR_CORS = 1;
 	public static int NB_TRESOR = 1;
 	public static double PROPORTION_CASES_TERRE = 0.9;
+	public static int VISIBILITE_PERSO = 2;
 	
 	private ArrayList<Case> cases;
 	
@@ -150,20 +151,21 @@ public class Plateau {
 	
 	public static Pair<Integer,Integer> indexToCoords(int i,int dim)
 	{
-//		return new Pair<Integer,Integer>(new Integer(i%dim),new Integer(i/dim));
+		if(i<0 || i>dim*dim-1)
+			return null;
+		
 		return new Pair<Integer,Integer>(new Integer(i/dim),new Integer(i%dim));
 	}
 	
 	public static int coordsToIndex(Pair<Integer,Integer> coords,int dim)
 	{
-//		return coords.value*dim+coords.key;
+		if(coords.key<0 || coords.key>dim-1 || coords.value<0 || coords.value>dim-1)
+			return -1;
 		
 		return coords.key*dim+coords.value;
-		
-//		return coords.key*dim+coords.value+coords.key;
 	}
 
-	public void afficher()
+	public void afficherAll()
 	{
 //		affichage avec seulement les numeros de colonne
 //		ArrayList<String> headers = new ArrayList<String>();
@@ -215,6 +217,59 @@ public class Plateau {
 		System.out.println(FlipTable.of(s_headers, data));
 	}
 	
+	public void afficher(Personnage p)
+	{
+		Pair<Integer,Integer> coordsP = p.getCoords();
+		ArrayList<Integer> indexCasesVisibles = new ArrayList<Integer>();
+		for(int i=coordsP.key-VISIBILITE_PERSO;i<=coordsP.key+VISIBILITE_PERSO;++i)
+		{
+			for(int j=coordsP.value-VISIBILITE_PERSO;j<=coordsP.value+VISIBILITE_PERSO;++j)
+			{
+				Pair<Integer,Integer> coordsTmp = new Pair<Integer,Integer>(i,j);
+				int indexTmp = Plateau.coordsToIndex(coordsTmp, this.dim);
+				if(indexTmp!=-1)
+					indexCasesVisibles.add(new Integer(indexTmp));
+			}
+		}
+		
+		
+		ArrayList<String> headers = new ArrayList<String>();
+		headers.add(new String(""));
+		for(int i=1;i<=this.dim;++i)
+			headers.add(new String("~"+String.valueOf(i)+"~"));
+		
+		String[] s_headers = new String[headers.size()];
+		s_headers = headers.toArray(s_headers);
+		
+		String[][] data = new String[this.dim][this.dim+1];
+		for(int i = 0;i<=this.dim-1;++i)
+		{
+			for(int j = 0;j<=this.dim;++j)
+			{
+				if(j==0)
+					data[i][j]="~"+Character.toString((char)(i+1+64))+"~";
+				else
+				{
+					int indexTmp = Plateau.coordsToIndex(new Pair<Integer,Integer>(new Integer(i),new Integer(j-1)),this.dim);
+					Case c = this.cases.get(indexTmp);
+					Pair<String[], String[][]> c_tui;
+					if(!indexCasesVisibles.contains(indexTmp))
+					{
+//						faire un clone de la case ou on enleve le loot avant de l'afficher
+						Case caseSansLoot = new Case(c);
+						caseSansLoot.setLoot(null);
+						c_tui = caseSansLoot.toTui();
+					}
+					else
+						c_tui = c.toTui();
+					data[i][j]=FlipTable.of(c_tui.key, c_tui.value);
+				}
+			}
+		}
+		AnsiTerminal.clear();
+		System.out.println(FlipTable.of(s_headers, data));
+	}
+	
 	public void afficherText()
 	{
 		for(int i = 0; i < this.cases.size(); i++)
@@ -240,8 +295,9 @@ public class Plateau {
 		
 		try {
 			p = new Plateau(corsaires,pirates,5);
-			p.afficherText();
-			p.afficher();
+//			p.afficherText();
+//			p.afficher();
+			p.afficher(corsaires.get(0));
 
 		} catch (PlateauException e) {
 			System.out.println(e.getMessage());
