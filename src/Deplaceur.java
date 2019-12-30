@@ -7,12 +7,15 @@ public class Deplaceur {
 	
 	private Plateau plateau;
 	
+	public static final double MOUSQUET_BONUS = 0.90;
+	public static final double ARMURE_BONUS = 0.10;
+	
 	Deplaceur(Plateau p)
 	{
 		this.plateau=p;
 	}
 	
-	public boolean deplacer(Personnage p,Pair<Integer,Integer> direction)
+	public boolean deplacer(Personnage p,Pair<Integer,Integer> direction) throws InterruptedException
 	{
 		int dimension = this.plateau.getDimension();
 		int indexDepart = Plateau.coordsToIndex(p.getCoords(), dimension);
@@ -31,6 +34,25 @@ public class Deplaceur {
 		if(p instanceof Corsaire && this.plateau.getCases().get(indexArrivee).getType()==TypeCase.FORET && !((Corsaire)p).getInventaire().contains(Objet.MACHETTE))
 			return false;
 		
+//		si c'est un corsaire et qu'il y a un lootable sur case destination..
+		Lootable lootCase = this.plateau.getCases().get(indexArrivee).getLoot();
+		if(p instanceof Corsaire && lootCase != null && !((Corsaire) p).getInventaire().contains(lootCase))
+		{
+//			on l'ajoute à l'inventaire
+			((Corsaire) p).getInventaire().add(lootCase);
+			
+			if(lootCase==Bonus.ARMURE)
+				((Corsaire)p).setProbWinningFight(((Corsaire)p).getProbWinningFight()+ARMURE_BONUS);
+			else if(lootCase==Bonus.MOUSQUET)
+				((Corsaire)p).setProbWinningFight(((Corsaire)p).getProbWinningFight()+MOUSQUET_BONUS);
+			
+//			retirer le loot de la case
+			this.plateau.getCases().get(indexArrivee).setLoot(null);
+			
+			AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+((Corsaire) p).getNom()+AnsiTerminal.RESET+" obtient "+Case.LOOT_TUI_COLOR+lootCase.toString()+AnsiTerminal.RESET);
+		}
+			
+		
 //		retirer le perso de la case ou il se trouve
 		if(this.plateau.getCases().get(indexDepart).getPersos().contains(p))
 			this.plateau.getCases().get(indexDepart).getPersos().remove(p);
@@ -44,7 +66,7 @@ public class Deplaceur {
 		return true;
 	}
 	
-	public void deplacerAleat(Personnage p, List<Pair<Integer,Integer>> dirPossibles, int nbMaxDeplacements)
+	public void deplacerAleat(Personnage p, List<Pair<Integer,Integer>> dirPossibles, int nbMaxDeplacements) throws InterruptedException
 	{
 		Random r = new Random();
 		

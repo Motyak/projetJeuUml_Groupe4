@@ -57,10 +57,10 @@ public class Partie {
 		boolean inputCorrecte=false;
 		boolean deplacementReussi=true;
 		
-		AnsiTerminal.clear();
+//		AnsiTerminal.clear();
 	    
 		this.annoncerTourJoueur();
-		Thread.sleep(2000);
+//		Thread.sleep(2000);
 		
 		AnsiTerminal.clear();
 		
@@ -80,10 +80,11 @@ public class Partie {
 		this.getPlateau().afficher();
 	}
 	
-	private void annoncerTourJoueur()
+	private void annoncerTourJoueur() throws InterruptedException
 	{
 		if(this.joueurCourant!=null)
-			System.out.println("C'est au tour de "+AnsiTerminal.BLUE+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
+//			System.out.println("C'est au tour de "+AnsiTerminal.BLUE+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
+			AnsiTerminal.afficherMessage("C'est au tour de "+Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
 	}
 	
 	private void demanderInputJoueur()
@@ -95,7 +96,7 @@ public class Partie {
 		this.inputJoueur=s.next();
 	}
 	
-	private boolean traiterInput()
+	private boolean traiterInput() throws InterruptedException
 	{		
 //		deplacer le personnage du joueur courant dans la direction par rapport à l'input
 		return this.deplaceur.deplacer(this.joueurCourant, Partie.inputMap.get(this.inputJoueur));
@@ -109,7 +110,6 @@ public class Partie {
 		try {
 			partie = new Partie(corsaires,pirates,5);
 			partie.actionJoueur();
-			
 		}
 		catch (PartieException | PlateauException e) {
 			System.out.println(e.getMessage());
