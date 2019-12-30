@@ -9,7 +9,7 @@ public class Corsaire extends Personnage {
 	Corsaire(String nom) {
 		this.setNom(nom);
 		this.inventaire = new ArrayList<Lootable>();
-		this.setProbWinningFight(0.0);
+		this.probWinningFight=0.00;
 	}
 
 	public String getNom() {
@@ -24,12 +24,14 @@ public class Corsaire extends Personnage {
 		return inventaire;
 	}
 
-	public double getProbWinningFight() {
+	public double getProb() {
 		return probWinningFight;
 	}
 
-	public void setProbWinningFight(double probWinningFight) {
-		this.probWinningFight = probWinningFight;
+	public void addToProb(double prob) {
+		this.probWinningFight = this.probWinningFight+prob;
+		if(this.probWinningFight>1.00)
+			this.probWinningFight=1.00;
 	}
 
 }

@@ -8,6 +8,7 @@ public class Deplaceur {
 	private Plateau plateau;
 	
 	public static final double MOUSQUET_BONUS = 0.90;
+	public static final double MACHETTE_BONUS = 0.40;
 	public static final double ARMURE_BONUS = 0.10;
 	
 	Deplaceur(Plateau p)
@@ -38,18 +39,21 @@ public class Deplaceur {
 		Lootable lootCase = this.plateau.getCases().get(indexArrivee).getLoot();
 		if(p instanceof Corsaire && lootCase != null && !((Corsaire) p).getInventaire().contains(lootCase))
 		{
-//			on l'ajoute à l'inventaire
-			((Corsaire) p).getInventaire().add(lootCase);
+//			si c'est pas un trésor ou qu'il possede une pelle => l'ajoute à l'inventaire
+			if(lootCase!=ConditionVictoire.TRESOR || ((Corsaire) p).getInventaire().contains(Objet.PELLE))
+			{
+				((Corsaire) p).getInventaire().add(lootCase);
+				this.plateau.getCases().get(indexArrivee).setLoot(null);
+				AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+((Corsaire) p).getNom()+AnsiTerminal.RESET+" obtient "+Case.LOOT_TUI_COLOR+lootCase.toString()+AnsiTerminal.RESET);
+			}
 			
 			if(lootCase==Bonus.ARMURE)
-				((Corsaire)p).setProbWinningFight(((Corsaire)p).getProbWinningFight()+ARMURE_BONUS);
+				((Corsaire)p).addToProb(ARMURE_BONUS);
+			else if(lootCase==Objet.MACHETTE)
+				((Corsaire)p).addToProb(MACHETTE_BONUS);
 			else if(lootCase==Bonus.MOUSQUET)
-				((Corsaire)p).setProbWinningFight(((Corsaire)p).getProbWinningFight()+MOUSQUET_BONUS);
+				((Corsaire)p).addToProb(MOUSQUET_BONUS);
 			
-//			retirer le loot de la case
-			this.plateau.getCases().get(indexArrivee).setLoot(null);
-			
-			AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+((Corsaire) p).getNom()+AnsiTerminal.RESET+" obtient "+Case.LOOT_TUI_COLOR+lootCase.toString()+AnsiTerminal.RESET);
 		}
 			
 		

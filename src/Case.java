@@ -42,7 +42,7 @@ public class Case {
 //		if(this.getLoot()==null)
 //			loot.add("");
 //		else
-		if(this.getLoot()!=null)
+		if(this.getLoot()!=null && this.getLoot()!=ConditionVictoire.TRESOR)
 		{
 			loot.add("("+LOOT_TUI_COLOR+this.getLoot().toString().substring(0,4)+AnsiTerminal.RESET+")");
 			String[] s_loot = new String[loot.size()];
