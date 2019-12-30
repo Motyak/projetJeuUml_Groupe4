@@ -83,7 +83,7 @@ public class Partie {
 	private void annoncerTourJoueur()
 	{
 		if(this.joueurCourant!=null)
-			System.out.println("C'est au tour de "+this.joueurCourant.getNom()+" !");
+			System.out.println("C'est au tour de "+AnsiTerminal.BLUE+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
 	}
 	
 	private void demanderInputJoueur()

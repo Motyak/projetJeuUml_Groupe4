@@ -2,6 +2,10 @@ import java.util.ArrayList;
 
 public class Case {
 
+	public static final String CORS_TUI_COLOR = AnsiTerminal.BLUE;
+	public static final String PIR_TUI_COLOR = AnsiTerminal.RED;
+	public static final String LOOT_TUI_COLOR = AnsiTerminal.PURPLE;
+	
 	private TypeCase type;
 	private ArrayList<Personnage> persos;
 	private Lootable loot;
@@ -40,7 +44,7 @@ public class Case {
 //		else
 		if(this.getLoot()!=null)
 		{
-			loot.add("("+this.getLoot().toString().substring(0,4)+")");
+			loot.add("("+LOOT_TUI_COLOR+this.getLoot().toString().substring(0,4)+AnsiTerminal.RESET+")");
 			String[] s_loot = new String[loot.size()];
 			s_loot = loot.toArray(s_loot);
 			lignes.add(s_loot);
@@ -51,7 +55,7 @@ public class Case {
 		{
 			if(p instanceof Pirate)
 			{
-				pirate.add("<"+p.getClass().getSimpleName().substring(0,4)+">");
+				pirate.add("<"+PIR_TUI_COLOR+p.getClass().getSimpleName().substring(0,4)+AnsiTerminal.RESET+">");
 				String[] s_pirate = new String[pirate.size()];
 				s_pirate = pirate.toArray(s_pirate);
 				lignes.add(s_pirate);
@@ -64,7 +68,7 @@ public class Case {
 		{
 			if(p instanceof Corsaire)
 			{
-				corsaire.add("\""+((Corsaire) p).getNom()+"\"");
+				corsaire.add("\""+CORS_TUI_COLOR+((Corsaire) p).getNom()+AnsiTerminal.RESET+"\"");
 				String[] s_corsaire = new String[corsaire.size()];
 				s_corsaire = corsaire.toArray(s_corsaire);
 				lignes.add(s_corsaire);
