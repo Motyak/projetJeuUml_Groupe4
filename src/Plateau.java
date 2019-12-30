@@ -211,6 +211,7 @@ public class Plateau {
 
 			}
 		}
+		AnsiTerminal.clear();
 		System.out.println(FlipTable.of(s_headers, data));
 	}
 	

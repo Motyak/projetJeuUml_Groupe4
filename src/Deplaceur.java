@@ -1,5 +1,3 @@
-import java.nio.channels.FileLockInterruptionException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -19,10 +17,19 @@ public class Deplaceur {
 		int dimension = this.plateau.getDimension();
 		int indexDepart = Plateau.coordsToIndex(p.getCoords(), dimension);
 		Pair<Integer,Integer> coordsArrivee = new Pair<Integer,Integer>(p.getCoords().key+direction.key,p.getCoords().value+direction.value);
+		
 //		si coords en dehors du plateau => return false
 		if(coordsArrivee.key<0 || coordsArrivee.key>dimension-1 || coordsArrivee.value<0 || coordsArrivee.value>dimension-1)
 			return false;
+		
 		int indexArrivee = Plateau.coordsToIndex(coordsArrivee, dimension);
+//		si case destination = case EAU => return false
+		if(this.plateau.getCases().get(indexArrivee).getType()==TypeCase.EAU)
+			return false;
+		
+//		si c'est un corsaire et que destination = case foret et qu'il n'a pas de machette => return false
+		if(p instanceof Corsaire && this.plateau.getCases().get(indexArrivee).getType()==TypeCase.FORET && !((Corsaire)p).getInventaire().contains(Objet.MACHETTE))
+			return false;
 		
 //		retirer le perso de la case ou il se trouve
 		if(this.plateau.getCases().get(indexDepart).getPersos().contains(p))
@@ -43,7 +50,7 @@ public class Deplaceur {
 		
 //		generer nombre de deplacements
 		int nbDeplacements = r.nextInt(nbMaxDeplacements)+1;	//genere un nb entre 1 (compris) et nbMaxDeplacements (compris)
-		System.out.println(nbDeplacements);
+//		System.out.println(nbDeplacements);
 		
 		for(int i = 1;i<=nbDeplacements;++i)
 		{
@@ -51,7 +58,7 @@ public class Deplaceur {
 			while(impossible)
 			{
 				Pair<Integer,Integer> direction = dirPossibles.get(r.nextInt(dirPossibles.size()));
-				System.out.println(direction.key+";"+direction.value);
+//				System.out.println(direction.key+";"+direction.value);
 				impossible = !deplacer(p, direction);
 			}
 		}

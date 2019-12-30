@@ -1,11 +1,13 @@
+import java.util.ArrayList;
 
 public class Corsaire extends Personnage {
 
 	private String nom;
-//	ne pas oublier l'inventaire
+	private ArrayList<Lootable> inventaire;
 	
 	Corsaire(String nom) {
 		this.setNom(nom);
+		this.inventaire = new ArrayList<Lootable>();
 	}
 
 	public String getNom() {
@@ -14,6 +16,10 @@ public class Corsaire extends Personnage {
 
 	public void setNom(String nom) {
 		this.nom = nom;
+	}
+
+	public ArrayList<Lootable> getInventaire() {
+		return inventaire;
 	}
 
 }
