@@ -12,7 +12,7 @@ public class Partie {
 	private Deplaceur deplaceur;
 	
 	private int dimensionPlateau;
-	private int tour;
+//	private int tour;
 	private String inputJoueur;
 	private Corsaire joueurCourant;
 	
@@ -37,7 +37,7 @@ public class Partie {
 		this.dimensionPlateau=dimensionPlateau;
 		this.plateau=new Plateau(corsaires,pirates,dimensionPlateau);
 		this.deplaceur = new Deplaceur(this.plateau);
-		this.tour=0;
+//		this.tour=0;
 		this.inputJoueur=null;
 		this.joueurCourant=this.corsaires.get(0);
 	}
@@ -52,38 +52,9 @@ public class Partie {
 		return this.deplaceur;
 	}
 	
-	public void afficherPlateau()
+	private void afficherPlateau()
 	{
 		this.plateau.afficher(this.joueurCourant);
-	}
-	
-	public void actionJoueur() throws InterruptedException
-	{
-		boolean inputCorrecte=false;
-		boolean deplacementReussi=true;
-	    
-		this.annoncerTourJoueur();
-		
-//		boucle tant que deplacement impossible
-		do {
-//			boucle tant que input incorrecte
-			do {
-				this.afficherPlateau();
-				if(!deplacementReussi && inputCorrecte)
-					System.out.println("Déplacement impossible !");
-				this.demanderInputJoueur();
-				inputCorrecte = Arrays.asList("haut","bas","gauche","droite","haut_gauche","haut_droite","bas_gauche","bas_droite").contains(this.inputJoueur);
-			}while(!inputCorrecte);
-			deplacementReussi = this.traiterInput();
-		}while(!deplacementReussi);
-	}
-	
-	private void annoncerTourJoueur() throws InterruptedException
-	{
-		Pair<Integer,Integer> coords = this.joueurCourant.getCoords();
-		char coordLettre = (char)(coords.key.intValue()+65);
-		int coordNum = coords.value+1;
-		AnsiTerminal.afficherMessage("C'est au tour de "+Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
 	}
 	
 	private void demanderInputJoueur()
@@ -99,13 +70,39 @@ public class Partie {
 		this.inputJoueur=s.next();
 	}
 	
+	private void actionJoueur() throws InterruptedException
+	{
+		boolean inputCorrecte=false;
+		boolean deplacementReussi=true;
+	    
+//		annoncer tour du joueur
+		AnsiTerminal.afficherMessage("C'est au tour de "+Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
+		
+//		boucle tant que deplacement impossible
+		do {
+//			boucle tant que input incorrecte
+			do {
+				this.afficherPlateau();
+				if(!deplacementReussi && inputCorrecte)
+					System.out.println("Déplacement impossible !");
+				this.demanderInputJoueur();
+				inputCorrecte = Arrays.asList("haut","bas","gauche","droite","haut_gauche","haut_droite","bas_gauche","bas_droite").contains(this.inputJoueur);
+			}while(!inputCorrecte);
+			deplacementReussi = this.traiterInput();
+		}while(!deplacementReussi);
+	}
+	
+
+	
+
+	
 	private boolean traiterInput() throws InterruptedException
 	{		
 //		deplacer le personnage du joueur courant dans la direction par rapport à l'input
 		return this.deplaceur.deplacer(this.joueurCourant, Partie.inputMap.get(this.inputJoueur));
 	}
 	
-	public void actionPirates() throws InterruptedException
+	private void actionPirates() throws InterruptedException
 	{
 		if(this.pirates.isEmpty())
 			return;
@@ -122,7 +119,7 @@ public class Partie {
 		AnsiTerminal.sleep();
 	}
 	
-	public boolean verifierFinPartie() throws InterruptedException
+	private boolean verifierFinPartie() throws InterruptedException
 	{
 //		s'il n'y a plus de corsaires/joueurs restants..
 		if(this.corsaires.isEmpty())
@@ -146,7 +143,7 @@ public class Partie {
 		return false;
 	}
 	
-	public void faireCombattre() throws InterruptedException
+	private void faireCombattre() throws InterruptedException
 	{
 //		Faire la liste des combats
 		ArrayList<Pair<Pirate,Corsaire>> combats = new ArrayList<Pair<Pirate,Corsaire>>();
@@ -212,15 +209,14 @@ public class Partie {
 				int indexCorsaire = Plateau.coordsToIndex(pair.value.getCoords(), this.dimensionPlateau);
 				this.plateau.getCases().get(indexCorsaire).getPersos().remove(pair.value);
 //				si le joueur courant s'apprete a mourrir, on désigne un nouveau joueur courant
-				if(this.joueurCourant==pair.value)
-				{
-					if(this.corsaires.size()>1)
-					{
-						int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
-						this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
-					}
-				}
-					
+//				if(pair.value==this.joueurCourant)
+//				{
+//					if(this.corsaires.size()>1)
+//					{
+//						int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
+//						this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
+//					}
+//				}
 				this.corsaires.remove(pair.value);
 			}
 		}
@@ -232,7 +228,7 @@ public class Partie {
 		}
 	}
 	
-	public void designerProchainJoueur()
+	private void designerProchainJoueur()
 	{
 //		le cas ou il n'y a plus de corsaires (div zero)
 		if(this.corsaires.isEmpty())
@@ -247,6 +243,25 @@ public class Partie {
 		this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
 	}
 	
+	public void lancer() throws InterruptedException
+	{
+		boolean finPartie=false;
+		while(!finPartie)
+		{
+//			le joueur courant se déplace et ramasse automatiquement le loot
+			this.actionJoueur();
+			this.faireCombattre();
+			finPartie=this.verifierFinPartie();
+			if(!finPartie)
+			{
+				this.actionPirates();
+				this.faireCombattre();
+				this.designerProchainJoueur();
+				finPartie=this.verifierFinPartie();
+			}	
+		}
+	}
+	
 	public static void main(String args[])
 	{
 		ArrayList<Corsaire> corsaires = new ArrayList<Corsaire>();
@@ -256,23 +271,11 @@ public class Partie {
 		pirates.add(new Boucanier());
 		pirates.add(new Flibustier());
 		Partie partie;
+		
+//		création et lancement de la partie
 		try {
 			partie = new Partie(corsaires,pirates,5);
-			boolean finPartie=false;
-			while(!finPartie)
-			{
-//				le joueur courant se déplace et ramasse automatiquement le loot
-				partie.actionJoueur();
-				partie.faireCombattre();
-				finPartie=partie.verifierFinPartie();
-				if(!finPartie)
-				{
-					partie.actionPirates();
-					partie.faireCombattre();
-					partie.designerProchainJoueur();
-					finPartie=partie.verifierFinPartie();
-				}	
-			}
+			partie.lancer();
 		}
 		catch (PartieException | PlateauException e) {
 			System.out.println(e.getMessage());
