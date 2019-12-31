@@ -7,7 +7,7 @@ public class AnsiTerminal {
 	public static final String BLUE = "\033[1;34m";
 	public static final String PURPLE = "\033[1;35m";
 	
-	public static final int MSG_SLEEP_TIME = 1500;
+	public static final int MSG_SLEEP_TIME = 2000;
 	
 	public static void clear()
 	{
@@ -15,11 +15,18 @@ public class AnsiTerminal {
 	    System.out.flush();
 	}
 	
+	public static void sleep() throws InterruptedException
+	{
+		Thread.sleep(MSG_SLEEP_TIME);
+	}
+	
 	public static void afficherMessage(String msg) throws InterruptedException
 	{
 		AnsiTerminal.clear();
 		System.out.println(msg);
-		Thread.sleep(MSG_SLEEP_TIME);
+		AnsiTerminal.sleep();
 		AnsiTerminal.clear();
 	}
+	
+	
 }

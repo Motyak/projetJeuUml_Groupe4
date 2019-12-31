@@ -1,12 +1,12 @@
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
 public class Partie {
-	private List<Corsaire> corsaires;
-	private List<Pirate> pirates;
+	private ArrayList<Corsaire> corsaires;
+	private ArrayList<Pirate> pirates;
 	
 	private Plateau plateau;
 	private Deplaceur deplaceur;
@@ -27,7 +27,7 @@ public class Partie {
 		put("bas_droite",Direction.BAS_DROITE);
 	}};
 	
-	Partie(List<Corsaire> corsaires, List<Pirate> pirates, int dimensionPlateau) throws Exception
+	Partie(ArrayList<Corsaire> corsaires,ArrayList<Pirate> pirates, int dimensionPlateau) throws Exception
 	{
 		if(corsaires==null || corsaires.size()<1)
 			throw new PartieException("Corsaires non conformes");
@@ -64,8 +64,6 @@ public class Partie {
 	    
 		this.annoncerTourJoueur();
 		
-		AnsiTerminal.clear();
-		
 //		boucle tant que deplacement impossible
 		do {
 //			boucle tant que input incorrecte
@@ -78,8 +76,6 @@ public class Partie {
 			}while(!inputCorrecte);
 			deplacementReussi = this.traiterInput();
 		}while(!deplacementReussi);
-//		affichage plateau post deplacement
-		this.afficherPlateau();
 	}
 	
 	private void annoncerTourJoueur() throws InterruptedException
@@ -111,24 +107,32 @@ public class Partie {
 	
 	public void actionPirates() throws InterruptedException
 	{
+		if(this.pirates.isEmpty())
+			return;
 		AnsiTerminal.afficherMessage("Tour des pirates...");
 		for(Pirate p : this.pirates)
 		{
 			this.afficherPlateau();
-			Thread.sleep(1500);
+			AnsiTerminal.sleep();
 			this.deplaceur.deplacerAleat(p);
 		}
 		
+//		affichage plateau avec point de vue joueur precedent
 		this.afficherPlateau();
-		Thread.sleep(1500);
-		
-//		attribution prochain joueur
-		int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
-		this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
+		AnsiTerminal.sleep();
 	}
 	
 	public boolean verifierFinPartie() throws InterruptedException
 	{
+//		s'il n'y a plus de corsaires/joueurs restants..
+		if(this.corsaires.isEmpty())
+		{
+			AnsiTerminal.afficherMessage("Tous les corsaires ont péris !");
+			AnsiTerminal.afficherMessage("Personne ne gagne la partie !");
+			return true;
+		}
+			
+		
 //		si un joueur possède le trésor dans son inventaire, il a gagné => fin de partie
 		for(Corsaire c : this.corsaires)
 		{
@@ -142,26 +146,133 @@ public class Partie {
 		return false;
 	}
 	
+	public void faireCombattre() throws InterruptedException
+	{
+//		Faire la liste des combats
+		ArrayList<Pair<Pirate,Corsaire>> combats = new ArrayList<Pair<Pirate,Corsaire>>();
+		for(Pirate p : this.pirates)
+		{
+			Pair<Integer,Integer> coordsP = p.getCoords();
+			Case casePirate = this.plateau.getCases().get(Plateau.coordsToIndex(coordsP, this.dimensionPlateau));
+			
+//			le pirate attaque tous les corsaires sur la meme case que lui
+			ArrayList<Personnage> persosMemeCase = casePirate.getPersos();
+			for(Personnage perso : persosMemeCase)
+			{
+				if(perso instanceof Corsaire)
+					combats.add(new Pair<Pirate,Corsaire>(p,(Corsaire) perso));
+			}
+			
+			
+			if(p instanceof Flibustier)
+			{
+				for(int i=coordsP.key-1;i<=coordsP.key+1;++i)
+				{
+					for(int j=coordsP.value-1;j<=coordsP.value+1;++j)
+					{
+//						ne pas traiter le cas ou la case = la case du pirate car deja traitée
+						if(i==coordsP.key && j==coordsP.value)
+							continue;
+						Pair<Integer,Integer> coordsTmp = new Pair<Integer,Integer>(i,j);
+						int indexTmp = Plateau.coordsToIndex(coordsTmp, this.dimensionPlateau);
+//						si on est en dehors du plateau, on ne traite pas
+						if(indexTmp==-1)
+							continue;
+
+						Pair<Integer,Integer> coord = new Pair<Integer,Integer>(i,j);
+						ArrayList<Personnage> pers = this.plateau.getCases().get(Plateau.coordsToIndex(coord, this.dimensionPlateau)).getPersos();
+						for(Personnage perso : pers)
+						{
+							if(perso instanceof Corsaire)
+								combats.add(new Pair<Pirate,Corsaire>(p,(Corsaire) perso));
+						}
+					}
+				}
+			}
+		}
+		
+		for(Pair<Pirate,Corsaire> pair : combats)
+		{
+//			si pirate/corsaire déjà mort lors d'un précédent combat => on passe
+			if(!this.pirates.contains(pair.key) || !this.corsaires.contains(pair.value))
+				continue;
+			AnsiTerminal.afficherMessage(Case.PIR_TUI_COLOR+pair.key.getClass().getSimpleName()+AnsiTerminal.RESET+" attaque "+Case.CORS_TUI_COLOR+pair.value.getNom()+AnsiTerminal.RESET);
+			boolean pirateMeurt=Math.random()>=1.0-pair.value.getProb();
+			if(pirateMeurt)
+			{
+				AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+pair.value.getNom()+AnsiTerminal.RESET+" a vaincu "+Case.PIR_TUI_COLOR+pair.key.getClass().getSimpleName()+AnsiTerminal.RESET);
+				int indexPirate = Plateau.coordsToIndex(pair.key.getCoords(), this.dimensionPlateau);
+				this.plateau.getCases().get(indexPirate).getPersos().remove(pair.key);
+				this.pirates.remove(pair.key);
+			}
+				
+			else
+			{
+				AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+pair.value.getNom()+AnsiTerminal.RESET+" a péri face à "+Case.PIR_TUI_COLOR+pair.key.getClass().getSimpleName()+AnsiTerminal.RESET);
+				int indexCorsaire = Plateau.coordsToIndex(pair.value.getCoords(), this.dimensionPlateau);
+				this.plateau.getCases().get(indexCorsaire).getPersos().remove(pair.value);
+//				si le joueur courant s'apprete a mourrir, on désigne un nouveau joueur courant
+				if(this.joueurCourant==pair.value)
+				{
+					if(this.corsaires.size()>1)
+					{
+						int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
+						this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
+					}
+				}
+					
+				this.corsaires.remove(pair.value);
+			}
+		}
+//		si y'a eu au moins un combat => on affiche le plateau pour voir résultats avant le tour des pirates
+		if(!combats.isEmpty())
+		{
+			this.afficherPlateau();
+			AnsiTerminal.sleep();
+		}
+	}
+	
+	public void designerProchainJoueur()
+	{
+//		le cas ou il n'y a plus de corsaires (div zero)
+		if(this.corsaires.isEmpty())
+			return;
+		
+		if(this.joueurCourant==null)
+			return;
+		
+		int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
+
+//		cas general, si joueur d'après est mort => pas grave car tassement de l'arraylist
+		this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
+	}
+	
 	public static void main(String args[])
 	{
-		List<Corsaire> corsaires = Arrays.asList(new Corsaire("_J1_"),new Corsaire("_J2_"));
-		List<Pirate> pirates = Arrays.asList(new Boucanier(),new Flibustier());
+		ArrayList<Corsaire> corsaires = new ArrayList<Corsaire>();
+		corsaires.add(new Corsaire("_J1_"));
+		corsaires.add(new Corsaire("_J2_"));
+		ArrayList<Pirate> pirates = new ArrayList<Pirate>();
+		pirates.add(new Boucanier());
+		pirates.add(new Flibustier());
 		Partie partie;
 		try {
 			partie = new Partie(corsaires,pirates,5);
 			boolean finPartie=false;
 			while(!finPartie)
 			{
+//				le joueur courant se déplace et ramasse automatiquement le loot
 				partie.actionJoueur();
+				partie.faireCombattre();
 				finPartie=partie.verifierFinPartie();
 				if(!finPartie)
 				{
-					Thread.sleep(1500);
 					partie.actionPirates();
-				}
-					
+					partie.faireCombattre();
+					partie.designerProchainJoueur();
+					finPartie=partie.verifierFinPartie();
+				}	
 			}
-				
 		}
 		catch (PartieException | PlateauException e) {
 			System.out.println(e.getMessage());

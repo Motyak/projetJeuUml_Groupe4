@@ -23,12 +23,9 @@ public class Deplaceur {
 		Pair<Integer,Integer> coordsArrivee = new Pair<Integer,Integer>(p.getCoords().key+direction.key,p.getCoords().value+direction.value);
 		int indexArrivee = Plateau.coordsToIndex(coordsArrivee, dimension);
 		
-//		si coords en dehors du plateau => return false
-//		if(coordsArrivee.key<0 || coordsArrivee.key>dimension-1 || coordsArrivee.value<0 || coordsArrivee.value>dimension-1)
-//			return false;
+//		si coords en dehors du plateau
 		if(indexArrivee==-1)
 			return false;
-		
 		
 //		si case destination = case EAU => return false
 		if(this.plateau.getCases().get(indexArrivee).getType()==TypeCase.EAU)
@@ -37,6 +34,23 @@ public class Deplaceur {
 //		si c'est un corsaire et que destination = case foret et qu'il n'a pas de machette => return false
 		if(p instanceof Corsaire && this.plateau.getCases().get(indexArrivee).getType()==TypeCase.FORET && !((Corsaire)p).getInventaire().contains(Objet.MACHETTE))
 			return false;
+		
+//		retirer le perso de la case ou il se trouve
+		if(this.plateau.getCases().get(indexDepart).getPersos().contains(p))
+			this.plateau.getCases().get(indexDepart).getPersos().remove(p);
+		
+//		ajouter le perso dans la case cible
+		this.plateau.getCases().get(indexArrivee).getPersos().add(p);
+		
+//		mettre a jour ses coordonnées
+		p.setCoords(coordsArrivee);
+		
+//		afficher map post deplacement pre ramassage (si c'est un corsaire)
+		if(p instanceof Corsaire)
+		{
+			this.plateau.afficher(p);
+			AnsiTerminal.sleep();
+		}
 		
 //		si c'est un corsaire et qu'il y a un lootable sur case destination..
 		Lootable lootCase = this.plateau.getCases().get(indexArrivee).getLoot();
@@ -48,6 +62,9 @@ public class Deplaceur {
 				((Corsaire) p).getInventaire().add(lootCase);
 				this.plateau.getCases().get(indexArrivee).setLoot(null);
 				AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+((Corsaire) p).getNom()+AnsiTerminal.RESET+" obtient "+Case.LOOT_TUI_COLOR+lootCase.toString()+AnsiTerminal.RESET);
+//				afficher plateau post ramassage
+				this.plateau.afficher(p);
+				AnsiTerminal.sleep();
 			}
 			
 			if(lootCase==Bonus.ARMURE)
@@ -58,17 +75,6 @@ public class Deplaceur {
 				((Corsaire)p).addToProb(MOUSQUET_BONUS);
 			
 		}
-			
-		
-//		retirer le perso de la case ou il se trouve
-		if(this.plateau.getCases().get(indexDepart).getPersos().contains(p))
-			this.plateau.getCases().get(indexDepart).getPersos().remove(p);
-		
-//		ajouter le perso dans la case cible
-		this.plateau.getCases().get(indexArrivee).getPersos().add(p);
-		
-//		mettre a jour ses coordonnées
-		p.setCoords(coordsArrivee);
 		
 		return true;
 	}
