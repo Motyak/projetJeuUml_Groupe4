@@ -6,7 +6,7 @@ public class Corsaire extends Personnage {
 	private ArrayList<Lootable> inventaire;
 	private double probWinningFight;
 	
-	Corsaire(String nom) {
+	public Corsaire(String nom) {
 		this.setNom(nom);
 		this.inventaire = new ArrayList<Lootable>();
 		this.probWinningFight=0.00;

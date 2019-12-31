@@ -61,11 +61,8 @@ public class Partie {
 	{
 		boolean inputCorrecte=false;
 		boolean deplacementReussi=true;
-		
-//		AnsiTerminal.clear();
 	    
 		this.annoncerTourJoueur();
-//		Thread.sleep(2000);
 		
 		AnsiTerminal.clear();
 		
@@ -87,17 +84,22 @@ public class Partie {
 	
 	private void annoncerTourJoueur() throws InterruptedException
 	{
-		if(this.joueurCourant!=null)
-//			System.out.println("C'est au tour de "+AnsiTerminal.BLUE+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
-			AnsiTerminal.afficherMessage("C'est au tour de "+Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
+		Pair<Integer,Integer> coords = this.joueurCourant.getCoords();
+		char coordLettre = (char)(coords.key.intValue()+65);
+		int coordNum = coords.value+1;
+		AnsiTerminal.afficherMessage("C'est au tour de "+Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+" !");
 	}
 	
 	private void demanderInputJoueur()
 	{
-		Scanner s = new Scanner(System.in);
+		Pair<Integer,Integer> coords = this.joueurCourant.getCoords();
+		char coordLettre = (char)(coords.key.intValue()+65);
+		int coordNum = coords.value+1;
 
 		System.out.println("Dans quelle direction souhaitez-vous vous déplacer ?");
-		System.out.println("('haut','bas','gauche','droite','haut_gauche','haut_droite','bas_gauche','bas_droite')");
+		System.out.println("('haut','bas','gauche','droite','haut_gauche','haut_droite','bas_gauche','bas_droite')\n");
+		System.out.print(Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+"("+coordLettre+";"+coordNum+")>");
+		Scanner s = new Scanner(System.in);
 		this.inputJoueur=s.next();
 	}
 	
@@ -107,6 +109,39 @@ public class Partie {
 		return this.deplaceur.deplacer(this.joueurCourant, Partie.inputMap.get(this.inputJoueur));
 	}
 	
+	public void actionPirates() throws InterruptedException
+	{
+		AnsiTerminal.afficherMessage("Tour des pirates...");
+		for(Pirate p : this.pirates)
+		{
+			this.afficherPlateau();
+			Thread.sleep(1500);
+			this.deplaceur.deplacerAleat(p);
+		}
+		
+		this.afficherPlateau();
+		Thread.sleep(1500);
+		
+//		attribution prochain joueur
+		int indexJoueurCourant=this.corsaires.indexOf(this.joueurCourant);
+		this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
+	}
+	
+	public boolean verifierFinPartie() throws InterruptedException
+	{
+//		si un joueur possède le trésor dans son inventaire, il a gagné => fin de partie
+		for(Corsaire c : this.corsaires)
+		{
+			if(c.getInventaire().contains(ConditionVictoire.TRESOR))
+			{
+				AnsiTerminal.afficherMessage("Le joueur "+Case.CORS_TUI_COLOR+c.getNom()+AnsiTerminal.RESET+" a trouvé le trésor !");
+				AnsiTerminal.afficherMessage(Case.CORS_TUI_COLOR+c.getNom()+AnsiTerminal.RESET+" gagne la partie !");
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public static void main(String args[])
 	{
 		List<Corsaire> corsaires = Arrays.asList(new Corsaire("_J1_"),new Corsaire("_J2_"));
@@ -114,7 +149,19 @@ public class Partie {
 		Partie partie;
 		try {
 			partie = new Partie(corsaires,pirates,5);
-			partie.actionJoueur();
+			boolean finPartie=false;
+			while(!finPartie)
+			{
+				partie.actionJoueur();
+				finPartie=partie.verifierFinPartie();
+				if(!finPartie)
+				{
+					Thread.sleep(1500);
+					partie.actionPirates();
+				}
+					
+			}
+				
 		}
 		catch (PartieException | PlateauException e) {
 			System.out.println(e.getMessage());

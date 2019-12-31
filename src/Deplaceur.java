@@ -73,8 +73,11 @@ public class Deplaceur {
 		return true;
 	}
 	
-	public void deplacerAleat(Personnage p, List<Pair<Integer,Integer>> dirPossibles, int nbMaxDeplacements) throws InterruptedException
+	public void deplacerAleat(Pirate p) throws InterruptedException
 	{
+		List<Pair<Integer,Integer>> dirPossibles = p.getDirPossibles();
+		int nbMaxDeplacements = p.getNbMaxDeplacements();
+		
 		Random r = new Random();
 		
 //		generer nombre de deplacements
@@ -111,10 +114,10 @@ public class Deplaceur {
 			Personnage persoADeplacer = plateau.getCases().get(a).getPersos().get(0);
 			
 //			d.deplacer(persoADeplacer, Direction.HAUT);
-//			d.deplacer(persoADeplacer, Direction.GAUCHE);
-//			d.deplacer(persoADeplacer, Direction.BAS_DROITE);
+			d.deplacer(persoADeplacer, Direction.GAUCHE);
+			d.deplacer(persoADeplacer, Direction.BAS_DROITE);
 			
-			d.deplacerAleat(persoADeplacer, Direction.LIGNES_DROITES_ET_DIAG, 3);
+//			d.deplacerAleat((Pirate)persoADeplacer);
 			
 			plateau.afficherAll();		
 
