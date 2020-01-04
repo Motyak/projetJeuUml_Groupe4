@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
+
 /**
- * <pre>
- * ╔═════════════╤════════════════════════════╤══════════════╗
- * ║ Name        │ Function                   │ Author       ║
- * ╠═════════════╪════════════════════════════╪══════════════╣
- * ║ Flip Tables │ Pretty-print a text table. │ Jake Wharton ║
- * ╚═════════════╧════════════════════════════╧══════════════╝
- * </pre>
+ * @author Jake Wharton
+ *
  */
 public final class FlipTable {
   private static final String EMPTY = "      ";

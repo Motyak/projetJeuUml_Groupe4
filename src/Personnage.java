@@ -1,4 +1,8 @@
 
+/**
+ * @author Tom
+ *
+ */
 public abstract class Personnage {
 
 	private Pair<Integer,Integer> coords;

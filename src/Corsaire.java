@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * @author Tom
+ *
+ */
 public class Corsaire extends Personnage {
 
 	private String nom;
@@ -28,6 +32,10 @@ public class Corsaire extends Personnage {
 		return probWinningFight;
 	}
 
+	/**
+	 * Adds probability amount to kill another pirate when facing him
+	 * @param prob Probability amount to add
+	 */
 	public void addToProb(double prob) {
 		this.probWinningFight = this.probWinningFight+prob;
 		if(this.probWinningFight>1.00)

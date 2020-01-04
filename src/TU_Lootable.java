@@ -1,5 +1,10 @@
 import java.util.ArrayList;
 
+/**
+ * Unit test for Lootable (basically useless)
+ * @author Tom
+ *
+ */
 public class TU_Lootable {
 
 	public static void main(String[] args) {

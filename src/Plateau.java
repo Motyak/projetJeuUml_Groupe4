@@ -3,6 +3,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author Tom
+ *
+ */
 public class Plateau {
 
 //	régles établies par le CDC
@@ -149,6 +153,12 @@ public class Plateau {
 		return this.dim;
 	}
 	
+	/**
+	 * returns board coords from index
+	 * @param i board index
+	 * @param dim board dimension
+	 * @return board coords
+	 */
 	public static Pair<Integer,Integer> indexToCoords(int i,int dim)
 	{
 		if(i<0 || i>dim*dim-1)
@@ -157,6 +167,12 @@ public class Plateau {
 		return new Pair<Integer,Integer>(new Integer(i/dim),new Integer(i%dim));
 	}
 	
+	/**
+	 * returns index from board coords
+	 * @param coords board coords
+	 * @param dim board dimension
+	 * @return index board index
+	 */
 	public static int coordsToIndex(Pair<Integer,Integer> coords,int dim)
 	{
 		if(coords.key<0 || coords.key>dim-1 || coords.value<0 || coords.value>dim-1)
@@ -165,6 +181,9 @@ public class Plateau {
 		return coords.key*dim+coords.value;
 	}
 
+	/**
+	 * prints board from absolute POV in the console
+	 */
 	public void afficherAll()
 	{
 //		affichage avec seulement les numeros de colonne
@@ -217,6 +236,10 @@ public class Plateau {
 		System.out.println(FlipTable.of(s_headers, data));
 	}
 	
+	/**
+	 * Prints board from a character's POV
+	 * @param p chatacter from which POV the board will be printed
+	 */
 	public void afficher(Personnage p)
 	{
 		Pair<Integer,Integer> coordsP = p.getCoords();
@@ -270,6 +293,9 @@ public class Plateau {
 		System.out.println(FlipTable.of(s_headers, data));
 	}
 	
+	/**
+	 * Prints board state in text format
+	 */
 	public void afficherText()
 	{
 		for(int i = 0; i < this.cases.size(); i++)

@@ -1,5 +1,9 @@
-import java.util.List;
 
+
+/**
+ * @author Tom
+ *
+ */
 public class Boucanier extends Pirate {
 
 	public static final int NB_DEPLACEMENTS_BOUC = 2;

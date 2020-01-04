@@ -3,6 +3,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * @author Tom
+ *
+ */
 public class Deplaceur {
 	
 	private Plateau plateau;
@@ -16,6 +20,13 @@ public class Deplaceur {
 		this.plateau=p;
 	}
 	
+	/**
+	 * Moves a character onto a specific direction
+	 * @param p Character to move
+	 * @param direction Direction in which character will move
+	 * @return false if the movement is impossible, true otherwise
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	public boolean deplacer(Personnage p,Pair<Integer,Integer> direction) throws InterruptedException
 	{
 		int dimension = this.plateau.getDimension();
@@ -79,6 +90,11 @@ public class Deplaceur {
 		return true;
 	}
 	
+	/**
+	 * Moves a pirate randomly depending on the pirate type
+	 * @param p Pirate to move
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	public void deplacerAleat(Pirate p) throws InterruptedException
 	{
 		List<Pair<Integer,Integer>> dirPossibles = p.getDirPossibles();

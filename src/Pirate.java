@@ -1,5 +1,9 @@
 import java.util.List;
 
+/**
+ * @author Tom
+ *
+ */
 public abstract class Pirate extends Personnage{
 
 	protected int nbMaxDeplacements;

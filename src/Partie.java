@@ -4,6 +4,10 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+/**
+ * @author Tom
+ *
+ */
 public class Partie {
 	private ArrayList<Corsaire> corsaires;
 	private ArrayList<Pirate> pirates;
@@ -52,11 +56,17 @@ public class Partie {
 		return this.deplaceur;
 	}
 	
+	/**
+	 * Prints the board in the console with current player's POV
+	 */
 	private void afficherPlateau()
 	{
 		this.plateau.afficher(this.joueurCourant);
 	}
 	
+	/**
+	 * Asks user for inputs
+	 */
 	private void demanderInputJoueur()
 	{
 		Pair<Integer,Integer> coords = this.joueurCourant.getCoords();
@@ -70,6 +80,10 @@ public class Partie {
 		this.inputJoueur=s.next();
 	}
 	
+	/**
+	 * Player action phase
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	private void actionJoueur() throws InterruptedException
 	{
 		boolean inputCorrecte=false;
@@ -96,6 +110,11 @@ public class Partie {
 	
 
 	
+	/**
+	 * Processes user input
+	 * @return false if the movement was impossible, true otherwise
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	private boolean traiterInput() throws InterruptedException
 	{		
 //		deplacer le personnage du joueur courant dans la direction par rapport à l'input
@@ -119,6 +138,11 @@ public class Partie {
 		AnsiTerminal.sleep();
 	}
 	
+	/**
+	 * Check if someone won the game
+	 * @return returns true if someone won the game, false otherwise
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	private boolean verifierFinPartie() throws InterruptedException
 	{
 //		s'il n'y a plus de corsaires/joueurs restants..
@@ -143,6 +167,10 @@ public class Partie {
 		return false;
 	}
 	
+	/**
+	 * Makes characters fight if needed
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	private void faireCombattre() throws InterruptedException
 	{
 //		Faire la liste des combats
@@ -228,6 +256,9 @@ public class Partie {
 		}
 	}
 	
+	/**
+	 * Assign next current player
+	 */
 	private void designerProchainJoueur()
 	{
 //		le cas ou il n'y a plus de corsaires (div zero)
@@ -243,6 +274,10 @@ public class Partie {
 		this.joueurCourant=this.corsaires.get((indexJoueurCourant+1)%this.corsaires.size());
 	}
 	
+	/**
+	 * Launches the game
+	 * @throws InterruptedException because of thread.sleep
+	 */
 	public void lancer() throws InterruptedException
 	{
 		boolean finPartie=false;

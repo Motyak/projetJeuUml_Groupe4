@@ -1,6 +1,11 @@
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Provides an easy way to refer to directions without coords
+ * @author Tom
+ *
+ */
 public class Direction {
 	public static final Pair<Integer,Integer> HAUT = new Pair<Integer,Integer>(-1,0);
 	public static final Pair<Integer,Integer> BAS = new Pair<Integer,Integer>(1,0);

@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 
+/**
+ * @author Tom
+ *
+ */
 public class Case{
 
 	public static final String CORS_TUI_COLOR = AnsiTerminal.BLUE;
@@ -43,6 +47,9 @@ public class Case{
 		return persos;
 	}
 	
+	/**
+	 * @return Case in text format
+	 */
 	public Pair<String[],String[][]> toTui()
 	{
 		ArrayList<String[]> lignes = new ArrayList<String[]>();

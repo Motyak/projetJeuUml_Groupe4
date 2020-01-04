@@ -1,5 +1,9 @@
-import java.util.List;
 
+
+/**
+ * @author Tom
+ *
+ */
 public class Flibustier extends Pirate{
 
 	public static final int NB_DEPLACEMENTS_FLIB = 1;
