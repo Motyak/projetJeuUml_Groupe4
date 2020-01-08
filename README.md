@@ -4,4 +4,4 @@
 
 ## Execution du programme :
 
-*Depuis racine répertoire 'release' : java Partie
+* Depuis racine répertoire 'release' : java Partie
