@@ -75,6 +75,7 @@ public class Partie {
 
 		System.out.println("Dans quelle direction souhaitez-vous vous déplacer ?");
 		System.out.println("('haut','bas','gauche','droite','haut_gauche','haut_droite','bas_gauche','bas_droite')\n");
+		System.out.println("Pour afficher l'inventaire : 'inventaire'\n");
 		System.out.print(Case.CORS_TUI_COLOR+this.joueurCourant.getNom()+AnsiTerminal.RESET+"("+coordLettre+";"+coordNum+")>");
 		Scanner s = new Scanner(System.in);
 		this.inputJoueur=s.next();
@@ -97,10 +98,18 @@ public class Partie {
 //			boucle tant que input incorrecte
 			do {
 				this.afficherPlateau();
-				if(!deplacementReussi && inputCorrecte)
+				if(!deplacementReussi && inputCorrecte && !this.inputJoueur.equals("inventaire"))
 					System.out.println("Déplacement impossible !");
+				if(this.inputJoueur!=null&&this.inputJoueur.equals("inventaire"))
+				{
+					System.out.println("Inventaire : ");
+					for(Lootable l : this.joueurCourant.getInventaire())
+						System.out.println(l.toString());
+					System.out.println();
+				}
 				this.demanderInputJoueur();
-				inputCorrecte = Arrays.asList("haut","bas","gauche","droite","haut_gauche","haut_droite","bas_gauche","bas_droite").contains(this.inputJoueur);
+				inputCorrecte = Arrays.asList("haut","bas","gauche","droite","haut_gauche","haut_droite","bas_gauche","bas_droite","inventaire").contains(this.inputJoueur);
+				
 			}while(!inputCorrecte);
 			deplacementReussi = this.traiterInput();
 		}while(!deplacementReussi);
@@ -118,7 +127,10 @@ public class Partie {
 	private boolean traiterInput() throws InterruptedException
 	{		
 //		deplacer le personnage du joueur courant dans la direction par rapport à l'input
-		return this.deplaceur.deplacer(this.joueurCourant, Partie.inputMap.get(this.inputJoueur));
+		if(Partie.inputMap.get(this.inputJoueur)!=null)
+			return this.deplaceur.deplacer(this.joueurCourant, Partie.inputMap.get(this.inputJoueur));
+		
+		return false; //stub
 	}
 	
 	private void actionPirates() throws InterruptedException
@@ -297,19 +309,43 @@ public class Partie {
 		}
 	}
 	
-	public static void main(String args[])
+	public static void main(String args[]) throws Exception
 	{
 		ArrayList<Corsaire> corsaires = new ArrayList<Corsaire>();
-		corsaires.add(new Corsaire("_J1_"));
-		corsaires.add(new Corsaire("_J2_"));
 		ArrayList<Pirate> pirates = new ArrayList<Pirate>();
-		pirates.add(new Boucanier());
-		pirates.add(new Flibustier());
+		int dim;
+//		si configuration passée en param..
+		if(args[0]!=null&&args[1]!=null&&args[2]!=null)
+		{
+			if(Integer.parseInt(args[0])>9)
+				throw new Exception("nb de corsaires max : 9");
+			for(int i=1;i<=Integer.parseInt(args[0]);++i)
+				corsaires.add(new Corsaire("_J"+i+"_"));
+			for(int i=1;i<=Integer.parseInt(args[1])/2;++i)
+			{
+				pirates.add(new Boucanier());
+				pirates.add(new Flibustier());
+			}
+			if(Integer.parseInt(args[1])%2!=0)
+				pirates.add(new Boucanier());
+			
+			dim=Integer.parseInt(args[2]);
+		}
+		//config par défaut : 2 corsaires 2 pirates et plateau dim 5
+		else
+		{
+			corsaires.add(new Corsaire("_J1_"));
+			corsaires.add(new Corsaire("_J2_"));
+			pirates.add(new Boucanier());
+			pirates.add(new Flibustier());
+			dim=5;
+		}
+		
 		Partie partie;
 		
 //		création et lancement de la partie
 		try {
-			partie = new Partie(corsaires,pirates,5);
+			partie = new Partie(corsaires,pirates,dim);
 			partie.lancer();
 		}
 		catch (PartieException | PlateauException e) {
